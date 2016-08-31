@@ -1,0 +1,12 @@
+{
+  "name": "leaflet-measure-path",
+  "version": "1.0.0",
+  "homepage": "https://github.com/perliedman/leaflet-measure-path",
+  "authors": [
+    "Per Liedman <per@liedman.net> (http://www.liedman.net/)"
+  ],
+  "description": "Show measurements on Leaflet paths",
+  "keywords": ["leaflet", "measurement", "path"],
+  "license": "ISC",
+  "main": ["leaflet-measure-path.js", "leaflet-measure-path.css"]
+}
