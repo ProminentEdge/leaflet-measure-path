@@ -186,7 +186,7 @@
 
             this._measurementLayer.clearLayers();
 
-            if (this._measurementOptions.showDistances) {
+            if (this._measurementOptions.showDistances && latLngs.length > 1) {
                 formatter = this._measurementOptions.formatDistance || L.bind(this.formatDistance, this);
 
                 for (var i = 1, len = latLngs.length; (isPolygon && i <= len) || i < len; i++) {
@@ -202,7 +202,7 @@
                 }
             }
 
-            if (isPolygon && this._measurementOptions.showArea) {
+            if (isPolygon && this._measurementOptions.showArea && latLngs.length > 2) {
                 formatter = this._measurementOptions.formatArea || L.bind(this.formatArea, this);
                 var area = ringArea(latLngs);
                 L.marker.measurement(this.getBounds().getCenter(), formatter(area))
