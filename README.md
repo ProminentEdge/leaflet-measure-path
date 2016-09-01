@@ -34,7 +34,8 @@ Enables measurements. You can also overide the defaults by passing an options ob
 
 * `showOnHover: Boolean` (default `false`): if `true`, the measurements will only show when the user hovers the cursor over the path
 * `minDistance: Number` (default `30`): the minimum length a line segment in the feature must have for a measurement to be added
-* `formatFn: Function`: allows to override the built-in function that formats a distance number in meters to the string shown in the map
+* `formatDistance: Function`: allows to override the built-in function that formats a distance in meters to the string shown in the map
+* `formatArea: Function`: allows to override the built-in function that formats an area in square meters to the string shown in the map
 
 ### hideMeasurements()
 
