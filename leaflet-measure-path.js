@@ -122,7 +122,7 @@
             area = area * RADIUS * RADIUS / 2;
         }
 
-        return area;
+        return Math.abs(area);
     };
 
     var circleArea = function circleArea(d) {
