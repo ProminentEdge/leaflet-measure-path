@@ -153,7 +153,7 @@
         },
 
         hideMeasurements: function() {
-            this._map.on('zoomend', this.updateMeasurements, this);
+            this._map.off('zoomend', this.updateMeasurements, this);
 
             if (!this._measurementLayer) return this;
             this._map.removeLayer(this._measurementLayer);
