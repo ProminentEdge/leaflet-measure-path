@@ -77,7 +77,7 @@
 
         L.circle([57.705, 11.92], 750)
             .addTo(map)
-            .showMeasurements({imperial:true});
+            .showMeasurements({imperial:true, iconSize: [60, 30]});
 
         polygon.enableEdit();
         map.on('editable:vertex:drag editable:vertex:deleted', polygon.updateMeasurements, polygon);

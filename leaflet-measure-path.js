@@ -5,7 +5,7 @@
             L.Icon.prototype.initialize.call(this, L.extend({
                 className: 'leaflet-measure-path-measurement',
                 html: measurement,
-                iconSize: [36, 10]
+                iconSize: [50, 18]
             }, options));
         }
     });
@@ -178,6 +178,7 @@
         updateMeasurements: function() {
             var latLngs = this.getLatLngs(),
                 isPolygon = this instanceof L.Polygon,
+                options = this._measurementOptions,
                 formatter,
                 ll1,
                 ll2,
@@ -194,18 +195,21 @@
                     ll2 = latLngs[i % len];
                     pixelDist = this._map.latLngToLayerPoint(ll1).distanceTo(this._map.latLngToLayerPoint(ll2));
 
-                    if (pixelDist >= this._measurementOptions.minPixelDistance) {
+                    if (pixelDist >= options.minPixelDistance) {
                         dist = ll1.distanceTo(ll2);
-                        L.marker.measurement([(ll1.lat + ll2.lat) / 2, (ll1.lng + ll2.lng) / 2], formatter(dist))
+                        L.marker.measurement(
+                            [(ll1.lat + ll2.lat) / 2, (ll1.lng + ll2.lng) / 2], 
+                            formatter(dist),
+                            options)
                             .addTo(this._measurementLayer);
                     }
                 }
             }
 
-            if (isPolygon && this._measurementOptions.showArea && latLngs.length > 2) {
-                formatter = this._measurementOptions.formatArea || L.bind(this.formatArea, this);
+            if (isPolygon && options.showArea && latLngs.length > 2) {
+                formatter = options.formatArea || L.bind(this.formatArea, this);
                 var area = ringArea(latLngs);
-                L.marker.measurement(this.getBounds().getCenter(), formatter(area))
+                L.marker.measurement(this.getBounds().getCenter(), formatter(area), options)
                     .addTo(this._measurementLayer);
             }
         }
@@ -256,14 +260,15 @@
 
         updateMeasurements: function() {
             var latLng = this.getLatLng(),
-                formatter = this._measurementOptions.formatDistance || L.bind(this.formatDistance, this);
+                options = this._measurementOptions,
+                formatter = options.formatDistance || L.bind(this.formatDistance, this);
 
             this._measurementLayer.clearLayers();
 
-            if (this._measurementOptions.showArea) {
-                formatter = this._measurementOptions.formatArea || L.bind(this.formatArea, this);
+            if (options.showArea) {
+                formatter = options.formatArea || L.bind(this.formatArea, this);
                 var area = circleArea(this.getRadius());
-                L.marker.measurement(latLng, formatter(area))
+                L.marker.measurement(latLng, formatter(area), options)
                     .addTo(this._measurementLayer);
             }
         }
