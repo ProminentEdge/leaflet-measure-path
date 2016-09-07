@@ -2,7 +2,7 @@
 
 A plugin to show measurements on paths (polylines, polygons and circles currently supported).
 
-[Leaflet Measure Path demo](http://www.liedman.net/leaflet-measure-path/)
+[Leaflet Measure Path demo](http://prominentedge.com/leaflet-measure-path/)
 
 ## Usage
 
