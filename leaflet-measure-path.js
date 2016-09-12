@@ -132,6 +132,7 @@
 
     var polylineSetLatLngs = L.Polyline.prototype.setLatLngs;
     var polylineSpliceLatLngs = L.Polyline.prototype.spliceLatLngs;
+    var polylineOnAdd = L.Polyline.prototype.onAdd;
 
     L.Polyline.include({
         showMeasurements: function(options) {
@@ -165,6 +166,13 @@
             this._measurementLayer = null;
 
             return this;
+        },
+
+        onAdd: function() {
+            polylineOnAdd.apply(this, arguments);
+            if (this.options.showMeasurements) {
+                this.showMeasurements(this.options.measurementOptions);
+            }
         },
 
         setLatLngs: function() {
@@ -233,9 +241,15 @@
         }
     });
 
+    L.Polyline.addInitHook(function() {
+        if (this.options.showMeasurements) {
+            this.showMeasurements();
+        }
+    });
+
     var circleSetLatLng = L.Circle.prototype.setLatLng;
     var circleSetRadius = L.Circle.prototype.setRadius;
-
+    var circleOnAdd = L.Circle.prototype.onAdd;
 
     L.Circle.include({
         showMeasurements: function(options) {
@@ -262,6 +276,13 @@
             this._measurementLayer = null;
 
             return this;
+        },
+
+        onAdd: function() {
+            circleOnAdd.apply(this, arguments);
+            if (this.options.showMeasurements) {
+                this.showMeasurements(this.options.measurementOptions);
+            }
         },
 
         setLatLng: function() {
@@ -293,5 +314,11 @@
             }
         }
     })    
+
+    L.Circle.addInitHook(function() {
+        if (this.options.showMeasurements) {
+            this.showMeasurements();
+        }
+    });
 })();
 

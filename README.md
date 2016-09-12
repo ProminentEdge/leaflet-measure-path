@@ -24,7 +24,10 @@ var polygon = L.polygon([ ... ])
 
 ## API
 
-The plugin adds the methods listed below to Leaflet's `L.Polyline`, `L.Polygon` and `L.Circle` classes.
+The simplest way to enable measurements for a path is to pass the option `showMeasurements: true` when
+creating the path. To control the measurement options, you can also pass `measurementOptions`, see [options](#options) below.
+
+The plugin also adds the methods listed below to Leaflet's `L.Polyline`, `L.Polygon` and `L.Circle` classes.
 
 ### showMeasurements(options)
 

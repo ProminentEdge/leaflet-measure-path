@@ -58,26 +58,22 @@
                 [57.71, 11.89],
                 [57.71, 11.91],
                 [57.69, 11.91]
-            ])
-            .addTo(map)
-            .showMeasurements();
+            ], {showMeasurements: true})
+            .addTo(map);
 
         L.polyline([
                 [57.67, 11.85],
                 [57.677, 11.86],
                 [57.68, 11.85],
                 [57.69, 11.86],
-            ])
-            .addTo(map)
-            .showMeasurements({imperial:true});
+            ], {showMeasurements: true, measurementOptions: {imperial:true}})
+            .addTo(map);
 
-        L.circle([57.694, 11.94], 1000)
-            .addTo(map)
-            .showMeasurements();
+        L.circle([57.694, 11.94], 1000, {showMeasurements: true})
+            .addTo(map);
 
-        L.circle([57.705, 11.92], 750)
-            .addTo(map)
-            .showMeasurements({imperial:true, iconSize: [60, 30]});
+        L.circle([57.705, 11.92], 750, {showMeasurements: true, measurementOptions: {imperial:true, iconSize: [60, 30]}})
+            .addTo(map);
 
         polygon.enableEdit();
         map.on('editable:vertex:drag editable:vertex:deleted', polygon.updateMeasurements, polygon);
