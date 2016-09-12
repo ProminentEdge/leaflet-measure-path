@@ -176,6 +176,8 @@
         formatArea: formatArea,
 
         updateMeasurements: function() {
+            if (!this._measurementLayer) return;
+
             var latLngs = this.getLatLngs(),
                 isPolygon = this instanceof L.Polygon,
                 options = this._measurementOptions,
@@ -259,6 +261,8 @@
         formatArea: formatArea,
 
         updateMeasurements: function() {
+            if (!this._measurementLayer) return;
+
             var latLng = this.getLatLng(),
                 options = this._measurementOptions,
                 formatter = options.formatDistance || L.bind(this.formatDistance, this);
