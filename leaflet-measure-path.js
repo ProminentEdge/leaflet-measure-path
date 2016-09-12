@@ -1,4 +1,4 @@
-(function() {
+!(function() {
     'use strict';
     L.Icon.Measurement = L.DivIcon.extend({
         initialize: function(measurement, options) {
