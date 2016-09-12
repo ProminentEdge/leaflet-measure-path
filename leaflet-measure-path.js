@@ -130,9 +130,19 @@
         return 2 * Math.PI * RADIUS * RADIUS * (1 - Math.cos(rho));
     };
 
-    var polylineSetLatLngs = L.Polyline.prototype.setLatLngs;
-    var polylineSpliceLatLngs = L.Polyline.prototype.spliceLatLngs;
-    var polylineOnAdd = L.Polyline.prototype.onAdd;
+    var override = function(method, fn, hookAfter) {
+        if (!hookAfter) {
+            return function() {
+                method.apply(this, arguments);
+                fn.apply(this, arguments);
+            }
+        } else {
+            return function() {
+                fn.apply(this, arguments);
+                method.apply(this, arguments);
+            }
+        }
+    };
 
     L.Polyline.include({
         showMeasurements: function(options) {
@@ -168,22 +178,23 @@
             return this;
         },
 
-        onAdd: function() {
-            polylineOnAdd.apply(this, arguments);
+        onAdd: override(L.Polyline.prototype.onAdd, function() {
             if (this.options.showMeasurements) {
                 this.showMeasurements(this.options.measurementOptions);
             }
-        },
+        }),
 
-        setLatLngs: function() {
-            polylineSetLatLngs.apply(this, arguments);
-            this.updateMeasurements();
-        },
+        onRemove: override(L.Polyline.prototype.onRemove, function() {
+            this.hideMeasurements();
+        }, true),
 
-        spliceLatLngs: function() {
-            polylineSpliceLatLngs.apply(this, arguments);
+        setLatLngs: override(L.Polyline.prototype.setLatLngs, function() {
             this.updateMeasurements();
-        },
+        }),
+
+        spliceLatLngs: override(L.Polyline.prototype.spliceLatLngs, function() {
+            this.updateMeasurements();
+        }),
 
         formatDistance: formatDistance,
         formatArea: formatArea,
@@ -247,10 +258,6 @@
         }
     });
 
-    var circleSetLatLng = L.Circle.prototype.setLatLng;
-    var circleSetRadius = L.Circle.prototype.setRadius;
-    var circleOnAdd = L.Circle.prototype.onAdd;
-
     L.Circle.include({
         showMeasurements: function(options) {
             if (!this._map || this._measurementLayer) return this;
@@ -278,22 +285,23 @@
             return this;
         },
 
-        onAdd: function() {
-            circleOnAdd.apply(this, arguments);
+        onAdd: override(L.Circle.prototype.onAdd, function() {
             if (this.options.showMeasurements) {
                 this.showMeasurements(this.options.measurementOptions);
             }
-        },
+        }),
 
-        setLatLng: function() {
-            circleSetLatLng.apply(this, arguments);
-            this.updateMeasurements();
-        },
+        onRemove: override(L.Circle.prototype.onRemove, function() {
+            this.hideMeasurements();
+        }, true),
 
-        setRadius: function() {
-            circleSetRadius.apply(this, arguments);
+        setLatLng: override(L.Circle.prototype.setLatLng, function() {
             this.updateMeasurements();
-        },
+        }),
+
+        setRadius: override(L.Circle.prototype.setRadius, function() {
+            this.updateMeasurements();
+        }),
 
         formatArea: formatArea,
 

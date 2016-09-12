@@ -34,6 +34,29 @@ describe('leaflet-measure-path', function() {
                 expect(polygon.getLatLngs().length).to.be(5);
             })
         });
+
+        it('should add measurements', function() {
+                var polygon = L.polygon([
+                        [57.69, 11.89],
+                        [57.697, 11.88],
+                        [57.71, 11.89],
+                    ], {showMeasurements: true, measurementOptions: { minDistance: 0 }})
+                    .addTo(map);
+
+                expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(4);
+        });
+
+        it('should remove measurements', function() {
+                var polygon = L.polygon([
+                        [57.69, 11.89],
+                        [57.697, 11.88],
+                        [57.71, 11.89],
+                    ], {showMeasurements: true, measurementOptions: { minDistance: 0 }})
+                    .addTo(map);
+
+                map.removeLayer(polygon);
+                expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(0);
+        });
     })
 
     describe('Circle', function() {
