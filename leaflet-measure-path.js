@@ -20,6 +20,13 @@
             L.Marker.prototype.initialize.call(this, latLng, L.extend({
                 icon: icon
             }, options));
+        },
+
+        _setPos: function() {
+            L.Marker.prototype._setPos.apply(this, arguments);
+            if (this.options.rotation) {
+                this._icon.style.transform += ' rotate(' + this.options.rotation + 'rad)';
+            }
         }
     });
 
@@ -229,7 +236,7 @@
                         L.marker.measurement(
                             [(ll1.lat + ll2.lat) / 2, (ll1.lng + ll2.lng) / 2], 
                             '<span title="' + options.lang.segmentLength + '">' + formatter(dist) + '</span>',
-                            options)
+                            L.extend({}, options, { rotation: this._getRotation(ll1, ll2)}))
                             .addTo(this._measurementLayer);
                     }
                 }
@@ -249,6 +256,13 @@
                     '<span title="' + options.lang.totalArea + '">' + formatter(area) + '</span>', options)
                     .addTo(this._measurementLayer);
             }
+        },
+
+        _getRotation: function(ll1, ll2) {
+            var p1 = this._map.project(ll1),
+                p2 = this._map.project(ll2);
+
+            return Math.atan((p2.y - p1.y) / (p2.x - p1.x));
         }
     });
 
