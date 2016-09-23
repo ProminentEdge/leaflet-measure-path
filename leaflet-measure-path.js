@@ -137,6 +137,17 @@
         return 2 * Math.PI * RADIUS * RADIUS * (1 - Math.cos(rho));
     };
 
+    var isClockwise = function(ps) {
+        var sum = 0;
+        for (var i = 1; i <= ps.length; i++) {
+            var p1 = ps[i - 1];
+            var p2 = ps[i % ps.length];
+            sum += (p2.x - p1.x) * (p2.y - p1.y);
+        }
+
+        return sum >= 0;
+    }
+
     var override = function(method, fn, hookAfter) {
         if (!hookAfter) {
             return function() {
@@ -164,7 +175,8 @@
                     totalLength: 'Total length',
                     totalArea: 'Total area',
                     segmentLength: 'Segment length'
-                }
+                },
+                measurementOffset: [0, -12]
             }, options || {});
 
             this._measurementLayer = L.layerGroup().addTo(this._map);
@@ -210,14 +222,20 @@
             if (!this._measurementLayer) return;
 
             var latLngs = this.getLatLngs(),
-                isPolygon = this instanceof L.Polygon,
                 options = this._measurementOptions,
+                ps = latLngs.map(function(ll) { return this._map.project(ll); }.bind(this)),
+                offset = isClockwise(ps) ? options.measurementOffset : L.point(options.measurementOffset).multiplyBy(-1),
+                isPolygon = this instanceof L.Polygon,
                 totalDist = 0,
                 formatter,
                 ll1,
                 ll2,
+                p1,
+                p2,
                 pixelDist,
-                dist;
+                dist,
+                rotation,
+                pOffset;
 
             this._measurementLayer.clearLayers();
 
@@ -227,16 +245,23 @@
                 for (var i = 1, len = latLngs.length; (isPolygon && i <= len) || i < len; i++) {
                     ll1 = latLngs[i - 1];
                     ll2 = latLngs[i % len];
+                    p1 = ps[i - 1];
+                    p2 = ps[i % len];
                     dist = ll1.distanceTo(ll2);
                     totalDist += dist;
 
-                    pixelDist = this._map.latLngToLayerPoint(ll1).distanceTo(this._map.latLngToLayerPoint(ll2));
+                    pixelDist = p1.distanceTo(p2);
 
                     if (pixelDist >= options.minPixelDistance) {
+                        rotation = Math.atan((p2.y - p1.y) / (p2.x - p1.x));
+                        pOffset = L.point(
+                            offset.x * Math.cos(rotation) - offset.y * Math.sin(rotation),
+                            offset.y * Math.cos(rotation) + offset.x * Math.sin(rotation));
+
                         L.marker.measurement(
                             [(ll1.lat + ll2.lat) / 2, (ll1.lng + ll2.lng) / 2], 
                             '<span title="' + options.lang.segmentLength + '">' + formatter(dist) + '</span>',
-                            L.extend({}, options, { rotation: this._getRotation(ll1, ll2)}))
+                            L.extend({}, options, { rotation: rotation, iconAnchor: pOffset }))
                             .addTo(this._measurementLayer);
                     }
                 }
@@ -257,13 +282,6 @@
                     .addTo(this._measurementLayer);
             }
         },
-
-        _getRotation: function(ll1, ll2) {
-            var p1 = this._map.project(ll1),
-                p2 = this._map.project(ll2);
-
-            return Math.atan((p2.y - p1.y) / (p2.x - p1.x));
-        }
     });
 
     L.Polyline.addInitHook(function() {
