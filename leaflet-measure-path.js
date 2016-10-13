@@ -68,12 +68,11 @@
             sqfeet;
 
         if (this._measurementOptions.imperial) {
-            sqfeet = a / 0.09290304;
-            if (sqfeet > 100000) {
-                a = a / 2589988.11;
-                unit = 'mi<sup>2</sup>';
+            if (a > 404.685642) {
+                a = a / 4046.85642;
+                unit = 'ac';
             } else {
-                a = sqfeet;
+                a = a / 0.09290304;
                 unit = 'ft<sup>2</sup>';
             }
         } else {
