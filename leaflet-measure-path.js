@@ -323,7 +323,7 @@
 
             var latLng = this.getLatLng(),
                 options = this._measurementOptions,
-                formatter = options.formatDistance || L.bind(this.formatDistance, this);
+                formatter = options.formatArea || L.bind(this.formatArea, this);
 
             this._measurementLayer.clearLayers();
 
