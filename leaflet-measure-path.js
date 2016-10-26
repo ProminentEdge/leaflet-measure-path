@@ -1,37 +1,84 @@
 !(function() {
     'use strict';
-    L.Icon.Measurement = L.DivIcon.extend({
-        initialize: function(measurement, options) {
-            L.Icon.prototype.initialize.call(this, L.extend({
-                className: 'leaflet-measure-path-measurement',
-                html: measurement,
-                iconSize: [50, 18]
-            }, options));
-        }
-    });
+    // L.Icon.Measurement = L.DivIcon.extend({
+    //     initialize: function(measurement, title, options) {
+    //         L.Icon.prototype.initialize.call(this, L.extend({
+    //             className: 'leaflet-measure-path-measurement',
+    //             html: '<div title="' + title + ' ' + measurement + '"><div>' + measurement + '</div>' ,
+    //             iconSize: [0, 0]
+    //         }, options));
+    //     }
+    // });
 
-    L.icon.measurement = function(measurement, options) {
-        return new L.Icon.Measurement(measurement, options);
-    };
+    // L.icon.measurement = function(measurement, title, options) {
+    //     return new L.Icon.Measurement(measurement, title, options);
+    // };
 
-    L.Marker.Measurement = L.Marker.extend({
-        initialize: function(latLng, measurement, options) {
-            var icon = L.icon.measurement(measurement, options);
-            L.Marker.prototype.initialize.call(this, latLng, L.extend({
-                icon: icon
-            }, options));
+    // L.Marker.Measurement = L.Marker.extend({
+    //     initialize: function(latLng, measurement, title, rotation, options) {
+    //         this._rotation = rotation;
+    //         var icon = L.icon.measurement(measurement, title, options);
+    //         L.Marker.prototype.initialize.call(this, latLng, L.extend({
+    //             icon: icon
+    //         }, options));
+    //     },
+
+    //     _setPos: function() {
+    //         L.Marker.prototype._setPos.apply(this, arguments);
+    //         this._icon.style.transform += ' rotate(' + this._rotation + 'rad)';
+    //     }
+    // });
+
+    // L.marker.measurement = function(latLng, measurement, title, rotation, options) {
+    //     return new L.Marker.Measurement(latLng, measurement, title, rotation, options);
+    // };
+
+    L.Marker.Measurement = L.Layer.extend({
+        options: {
+            pane: 'markerPane'
         },
 
-        _setPos: function() {
-            L.Marker.prototype._setPos.apply(this, arguments);
-            if (this.options.rotation) {
-                this._icon.style.transform += ' rotate(' + this.options.rotation + 'rad)';
-            }
+        initialize: function(latlng, measurement, title, rotation, options) {
+            L.setOptions(this, options);
+
+            this._latlng = latlng;
+            this._measurement = measurement;
+            this._title = title;
+            this._rotation = rotation;
+        },
+
+        onAdd: function(map) {
+            this._map = map;
+            var el = this._element = L.DomUtil.create('div', 'leaflet-zoom-animated leaflet-measure-path-measurement', this.getPane());
+            var inner = L.DomUtil.create('div', '', el);
+            inner.title = this._title;
+            inner.innerHTML = this._measurement;
+
+            map.on('zoomanim', this._animateZoom, this);
+
+            this._setPosition();
+        },
+
+        onRemove: function() {
+            map.off('zoomanim', this._animateZoom, this);
+            this.getPane().removeChild(this._element);
+            this._map = null;
+        },
+
+        _setPosition: function() {
+            L.DomUtil.setPosition(this._element, this._map.latLngToLayerPoint(this._latlng));
+            this._element.style.transform += ' rotate(' + this._rotation + 'rad)';
+        },
+
+        _animateZoom: function(opt) {
+            var pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round();
+            L.DomUtil.setPosition(this._element, pos);
+            this._element.style.transform += ' rotate(' + this._rotation + 'rad)';
         }
     });
 
-    L.marker.measurement = function(latLng, measurement, options) {
-        return new L.Marker.Measurement(latLng, measurement, options);
+    L.marker.measurement = function(latLng, measurement, title, rotation, options) {
+        return new L.Marker.Measurement(latLng, measurement, title, rotation, options);
     };
 
     var formatDistance = function(d) {
@@ -73,14 +120,14 @@
                 unit = 'ac';
             } else {
                 a = a / 0.09290304;
-                unit = 'ft<sup>2</sup>';
+                unit = 'ft²';
             }
         } else {
             if (a > 100000) {
                 a = a / 100000;
-                unit = 'km<sup>2</sup>';
+                unit = 'km²';
             } else {
-                unit = 'm<sup>2</sup>';
+                unit = 'm²';
             }
         }
 
@@ -215,8 +262,16 @@
                 formatter,
                 ll1,
                 ll2,
+                p1,
+                p2,
                 pixelDist,
                 dist;
+
+            if (latLngs && latLngs.length && L.Util.isArray(latLngs[0])) {
+                // Outer ring is stored as an array in the first element,
+                // use that instead.
+                latLngs = latLngs[0];
+            }
 
             this._measurementLayer.clearLayers();
 
@@ -229,21 +284,22 @@
                     dist = ll1.distanceTo(ll2);
                     totalDist += dist;
 
-                    pixelDist = this._map.latLngToLayerPoint(ll1).distanceTo(this._map.latLngToLayerPoint(ll2));
+                    p1 = this._map.latLngToLayerPoint(ll1);
+                    p2 = this._map.latLngToLayerPoint(ll2);
+
+                    pixelDist = p1.distanceTo(p2);
 
                     if (pixelDist >= options.minPixelDistance) {
                         L.marker.measurement(
-                            [(ll1.lat + ll2.lat) / 2, (ll1.lng + ll2.lng) / 2], 
-                            '<span title="' + options.lang.segmentLength + '">' + formatter(dist) + '</span>',
-                            L.extend({}, options, { rotation: this._getRotation(ll1, ll2)}))
+                            this._map.layerPointToLatLng([(p1.x + p2.x) / 2, (p1.y + p2.y) / 2]), 
+                            formatter(dist), options.lang.segmentLength, this._getRotation(ll1, ll2), options)
                             .addTo(this._measurementLayer);
                     }
                 }
 
                 // Show total length for polylines
                 if (!isPolygon) {
-                    L.marker.measurement(ll2, '<strong title="' + options.lang.totalLength + '">' +
-                        formatter(totalDist) + '</strong>', options)
+                    L.marker.measurement(ll2, formatter(totalDist), options.lang.totalLength, 0, options)
                         .addTo(this._measurementLayer);
                 }
             }
@@ -252,7 +308,7 @@
                 formatter = options.formatArea || L.bind(this.formatArea, this);
                 var area = ringArea(latLngs);
                 L.marker.measurement(this.getBounds().getCenter(),
-                    '<span title="' + options.lang.totalArea + '">' + formatter(area) + '</span>', options)
+                    formatter(area), options.lang.totalArea, 0, options)
                     .addTo(this._measurementLayer);
             }
         },
@@ -277,7 +333,10 @@
 
             this._measurementOptions = L.extend({
                 showOnHover: false,
-                showArea: true
+                showArea: true,
+                lang: {
+                    totalArea: 'Total area',
+                }
             }, options || {});
 
             this._measurementLayer = L.layerGroup().addTo(this._map);
@@ -330,7 +389,8 @@
             if (options.showArea) {
                 formatter = options.formatArea || L.bind(this.formatArea, this);
                 var area = circleArea(this.getRadius());
-                L.marker.measurement(latLng, formatter(area), options)
+                L.marker.measurement(latLng, 
+                    formatter(area), options.lang.totalArea, 0, options)
                     .addTo(this._measurementLayer);
             }
         }
