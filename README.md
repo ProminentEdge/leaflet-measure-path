@@ -1,5 +1,7 @@
 # Leaflet Measure Path
 
+![Leaflet 1.0.0 compatible!](https://img.shields.io/badge/Leaflet%201.0.0-%E2%9C%93-1EB300.svg?style=flat)
+
 A plugin to show measurements on paths (polylines, polygons and circles currently supported).
 
 [Leaflet Measure Path demo](http://prominentedge.com/leaflet-measure-path/)
