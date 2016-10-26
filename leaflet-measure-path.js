@@ -33,7 +33,7 @@
     //     return new L.Marker.Measurement(latLng, measurement, title, rotation, options);
     // };
 
-    L.Marker.Measurement = L.Layer.extend({
+    L.Marker.Measurement = L[L.Layer ? 'Layer' : 'Class'].extend({
         options: {
             pane: 'markerPane'
         },
@@ -47,9 +47,15 @@
             this._rotation = rotation;
         },
 
+        addTo: function(map) {
+            map.addLayer(this);
+            return this;
+        },
+
         onAdd: function(map) {
             this._map = map;
-            var el = this._element = L.DomUtil.create('div', 'leaflet-zoom-animated leaflet-measure-path-measurement', this.getPane());
+            var pane = this.getPane ? this.getPane() : map.getPanes().markerPane;
+            var el = this._element = L.DomUtil.create('div', 'leaflet-zoom-animated leaflet-measure-path-measurement', pane);
             var inner = L.DomUtil.create('div', '', el);
             inner.title = this._title;
             inner.innerHTML = this._measurement;
@@ -61,7 +67,8 @@
 
         onRemove: function() {
             map.off('zoomanim', this._animateZoom, this);
-            this.getPane().removeChild(this._element);
+            var pane = this.getPane ? this.getPane() : map.getPanes().markerPane;
+            pane.removeChild(this._element);
             this._map = null;
         },
 
