@@ -65,7 +65,7 @@
             this._setPosition();
         },
 
-        onRemove: function() {
+        onRemove: function(map) {
             map.off('zoomanim', this._animateZoom, this);
             var pane = this.getPane ? this.getPane() : map.getPanes().markerPane;
             pane.removeChild(this._element);
