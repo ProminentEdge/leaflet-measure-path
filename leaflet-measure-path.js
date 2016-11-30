@@ -1,37 +1,5 @@
 !(function() {
     'use strict';
-    // L.Icon.Measurement = L.DivIcon.extend({
-    //     initialize: function(measurement, title, options) {
-    //         L.Icon.prototype.initialize.call(this, L.extend({
-    //             className: 'leaflet-measure-path-measurement',
-    //             html: '<div title="' + title + ' ' + measurement + '"><div>' + measurement + '</div>' ,
-    //             iconSize: [0, 0]
-    //         }, options));
-    //     }
-    // });
-
-    // L.icon.measurement = function(measurement, title, options) {
-    //     return new L.Icon.Measurement(measurement, title, options);
-    // };
-
-    // L.Marker.Measurement = L.Marker.extend({
-    //     initialize: function(latLng, measurement, title, rotation, options) {
-    //         this._rotation = rotation;
-    //         var icon = L.icon.measurement(measurement, title, options);
-    //         L.Marker.prototype.initialize.call(this, latLng, L.extend({
-    //             icon: icon
-    //         }, options));
-    //     },
-
-    //     _setPos: function() {
-    //         L.Marker.prototype._setPos.apply(this, arguments);
-    //         this._icon.style.transform += ' rotate(' + this._rotation + 'rad)';
-    //     }
-    // });
-
-    // L.marker.measurement = function(latLng, measurement, title, rotation, options) {
-    //     return new L.Marker.Measurement(latLng, measurement, title, rotation, options);
-    // };
 
     L.Marker.Measurement = L[L.Layer ? 'Layer' : 'Class'].extend({
         options: {
