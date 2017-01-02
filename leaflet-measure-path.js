@@ -163,11 +163,13 @@
             return function() {
                 method.apply(this, arguments);
                 fn.apply(this, arguments);
+                return this;
             }
         } else {
             return function() {
                 fn.apply(this, arguments);
                 method.apply(this, arguments);
+                return this;
             }
         }
     };
