@@ -162,12 +162,12 @@
         if (!hookAfter) {
             return function() {
                 method.apply(this, arguments);
-                fn.apply(this, arguments);
+                return fn.apply(this, arguments);
             }
         } else {
             return function() {
                 fn.apply(this, arguments);
-                method.apply(this, arguments);
+                return method.apply(this, arguments);
             }
         }
     };
