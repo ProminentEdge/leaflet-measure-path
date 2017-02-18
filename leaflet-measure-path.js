@@ -1,4 +1,4 @@
-!(function() {
+﻿!(function() {
     'use strict';
 
     L.Marker.Measurement = L[L.Layer ? 'Layer' : 'Class'].extend({
@@ -98,8 +98,8 @@
                 unit = 'ft²';
             }
         } else {
-            if (a > 100000) {
-                a = a / 100000;
+            if (a > 1000000) {
+                a = a / 1000000;
                 unit = 'km²';
             } else {
                 unit = 'm²';
