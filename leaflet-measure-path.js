@@ -1,4 +1,4 @@
-﻿!(function() {
+!(function() {
     'use strict';
 
     L.Marker.Measurement = L[L.Layer ? 'Layer' : 'Class'].extend({
@@ -217,18 +217,18 @@
         }, true),
 
         setLatLngs: override(L.Polyline.prototype.setLatLngs, function() {
-            this.updateMeasurements();
+            return this.updateMeasurements();
         }),
 
         spliceLatLngs: override(L.Polyline.prototype.spliceLatLngs, function() {
-            this.updateMeasurements();
+            return this.updateMeasurements();
         }),
 
         formatDistance: formatDistance,
         formatArea: formatArea,
 
         updateMeasurements: function() {
-            if (!this._measurementLayer) return;
+            if (!this._measurementLayer) return this;
 
             var latLngs = this.getLatLngs(),
                 isPolygon = this instanceof L.Polygon,
@@ -266,7 +266,7 @@
 
                     if (pixelDist >= options.minPixelDistance) {
                         L.marker.measurement(
-                            this._map.layerPointToLatLng([(p1.x + p2.x) / 2, (p1.y + p2.y) / 2]), 
+                            this._map.layerPointToLatLng([(p1.x + p2.x) / 2, (p1.y + p2.y) / 2]),
                             formatter(dist), options.lang.segmentLength, this._getRotation(ll1, ll2), options)
                             .addTo(this._measurementLayer);
                     }
@@ -286,6 +286,8 @@
                     formatter(area), options.lang.totalArea, 0, options)
                     .addTo(this._measurementLayer);
             }
+
+            return this;
         },
 
         _getRotation: function(ll1, ll2) {
@@ -364,12 +366,12 @@
             if (options.showArea) {
                 formatter = options.formatArea || L.bind(this.formatArea, this);
                 var area = circleArea(this.getRadius());
-                L.marker.measurement(latLng, 
+                L.marker.measurement(latLng,
                     formatter(area), options.lang.totalArea, 0, options)
                     .addTo(this._measurementLayer);
             }
         }
-    })    
+    })
 
     L.Circle.addInitHook(function() {
         if (this.options.showMeasurements) {
@@ -377,4 +379,3 @@
         }
     });
 })();
-
