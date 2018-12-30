@@ -50,32 +50,60 @@
     <script src="../leaflet-measure-path.js"></script>
     <script type="text/javascript">
         var map = L.map('map', {editable: true}).setView([57.69, 11.9], 13);
-
         L.tileLayer('http://tile.osm.org/{z}/{x}/{y}.png').addTo(map);
-
+        // Polygon that shows measurements from the start, agnostic of hover.
         var polygon = L.polygon([
                 [57.69, 11.89],
                 [57.697, 11.88],
                 [57.71, 11.89],
                 [57.71, 11.91],
                 [57.69, 11.91]
-            ], {showMeasurements: true})
+            ], { showMeasurements: true })
             .addTo(map);
-
+        // Polygon that shows measurements only when cursor hovers over polygon.
+        var polygonWithHover = L.polygon([
+                [57.668, 11.89],
+                [57.675, 11.88],
+                [57.688, 11.89],
+                [57.688, 11.91],
+                [57.668, 11.91]
+            ],
+            {
+                showMeasurements: true,
+                measurementOptions: { showOnHover: true }
+            })
+            .addTo(map);
+        // Path of lines that shows measurements from the start, agnostic of hover.
         L.polyline([
                 [57.67, 11.85],
                 [57.677, 11.86],
                 [57.68, 11.85],
                 [57.69, 11.86],
-            ], {showMeasurements: true, measurementOptions: {imperial:true}})
+            ],
+            {
+                showMeasurements: true,
+                measurementOptions: { imperial:true }
+            })
             .addTo(map);
-
-        L.circle([57.694, 11.94], 1000, {showMeasurements: true})
+        // Circle that shows measurements from the start, agnostic of hover.
+        L.circle([57.694, 11.94], 1000, { showMeasurements: true })
             .addTo(map);
-
-        L.circle([57.705, 11.92], 750, {showMeasurements: true, measurementOptions: {imperial:true}})
+        // Circle that shows measurements from the start in non-scientific-standard measurements
+        // (acres, etc.), agnostic of hover.
+        L.circle([57.705, 11.92], 750,
+            {
+                showMeasurements: true,
+                measurementOptions: { imperial:true }
+            })
             .addTo(map);
-
+        // Circle that shows measurements only when cursor hovers over circle.
+        L.circle([57.675, 11.92], 350,
+            {
+                showMeasurements: true,
+                measurementOptions: { showOnHover: true }
+            })
+            .addTo(map);
+        // Activates edit for non-hover polygon.
         polygon.enableEdit();
         map.on('editable:vertex:drag editable:vertex:deleted', polygon.updateMeasurements, polygon);
     </script>

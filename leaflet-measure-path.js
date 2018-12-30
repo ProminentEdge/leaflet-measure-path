@@ -152,6 +152,24 @@
 
         return Math.abs(area);
     };
+    /**
+     * Handles the init hook for polylines and circles.
+     * Implements the showOnHover functionality if called for.
+     */
+    var addInitHook = function() {
+        const showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
+        if (this.options.showMeasurements && !showOnHover) {
+            this.showMeasurements();
+        }
+        if (this.options.showMeasurements && showOnHover) {
+            this.on('mouseover', function() {
+                this.showMeasurements();
+            });
+            this.on('mouseout', function() {
+                this.hideMeasurements();
+            });
+        }
+    };
 
     var circleArea = function circleArea(d) {
         var rho = d / RADIUS;
@@ -177,7 +195,7 @@
             if (!this._map || this._measurementLayer) return this;
 
             this._measurementOptions = L.extend({
-                showOnHover: false,
+                showOnHover: (options && options.showOnHover) || false,
                 minPixelDistance: 30,
                 showDistances: true,
                 showArea: true,
@@ -197,6 +215,8 @@
         },
 
         hideMeasurements: function() {
+            if (!this._map) return this;
+
             this._map.off('zoomend', this.updateMeasurements, this);
 
             if (!this._measurementLayer) return this;
@@ -207,7 +227,8 @@
         },
 
         onAdd: override(L.Polyline.prototype.onAdd, function() {
-            if (this.options.showMeasurements) {
+            const showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
+            if (this.options.showMeasurements && !showOnHover) {
                 this.showMeasurements(this.options.measurementOptions);
             }
         }),
@@ -299,9 +320,7 @@
     });
 
     L.Polyline.addInitHook(function() {
-        if (this.options.showMeasurements) {
-            this.showMeasurements();
-        }
+        addInitHook.call(this);
     });
 
     L.Circle.include({
@@ -325,6 +344,8 @@
         },
 
         hideMeasurements: function() {
+            if (!this._map) return this;
+
             this._map.on('zoomend', this.updateMeasurements, this);
 
             if (!this._measurementLayer) return this;
@@ -335,7 +356,8 @@
         },
 
         onAdd: override(L.Circle.prototype.onAdd, function() {
-            if (this.options.showMeasurements) {
+            const showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
+            if (this.options.showMeasurements && !showOnHover) {
                 this.showMeasurements(this.options.measurementOptions);
             }
         }),
@@ -374,8 +396,6 @@
     })
 
     L.Circle.addInitHook(function() {
-        if (this.options.showMeasurements) {
-            this.showMeasurements();
-        }
+        addInitHook.call(this);
     });
 })();
