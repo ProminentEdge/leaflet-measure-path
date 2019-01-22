@@ -35,27 +35,86 @@ describe('leaflet-measure-path', function() {
             })
         });
 
-        it('should add measurements', function() {
+        describe('#showOnHover', function() {
+            it('should not add measurements', function() {
                 var polygon = L.polygon([
                         [57.69, 11.89],
                         [57.697, 11.88],
                         [57.71, 11.89],
-                    ], {showMeasurements: true, measurementOptions: { minDistance: 0 }})
+                    ],
+                    {
+                        showMeasurements: true,
+                        measurementOptions: {
+                            minDistance: 0,
+                            showOnHover: true
+                        }
+                    })
                     .addTo(map);
 
+                expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(0);
+            });
+
+            it('should add measurements on mouseover', function() {
+                var polygon = L.polygon([
+                        [57.69, 11.89],
+                        [57.697, 11.88],
+                        [57.71, 11.89],
+                    ],
+                    {
+                        showMeasurements: true,
+                        measurementOptions: {
+                            minDistance: 0,
+                            showOnHover: true
+                        }
+                    })
+                    .addTo(map);
+                
+                polygon.fire('mouseover');
                 expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(4);
+            });
+
+            it('should remove measurements on mouseout', function() {
+                var polygon = L.polygon([
+                        [57.69, 11.89],
+                        [57.697, 11.88],
+                        [57.71, 11.89],
+                    ],
+                    {
+                        showMeasurements: true,
+                        measurementOptions: {
+                            minDistance: 0,
+                            showOnHover: true
+                        }
+                    })
+                    .addTo(map);
+                
+                polygon.fire('mouseover');
+                polygon.fire('mouseout');
+                expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(0);
+            });
+        });
+
+        it('should add measurements', function() {
+            var polygon = L.polygon([
+                    [57.69, 11.89],
+                    [57.697, 11.88],
+                    [57.71, 11.89],
+                ], {showMeasurements: true, measurementOptions: { minDistance: 0 }})
+                .addTo(map);
+
+            expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(4);
         });
 
         it('should remove measurements', function() {
-                var polygon = L.polygon([
-                        [57.69, 11.89],
-                        [57.697, 11.88],
-                        [57.71, 11.89],
-                    ], {showMeasurements: true, measurementOptions: { minDistance: 0 }})
-                    .addTo(map);
+            var polygon = L.polygon([
+                    [57.69, 11.89],
+                    [57.697, 11.88],
+                    [57.71, 11.89],
+                ], {showMeasurements: true, measurementOptions: { minDistance: 0 }})
+                .addTo(map);
 
-                map.removeLayer(polygon);
-                expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(0);
+            map.removeLayer(polygon);
+            expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(0);
         });
     })
 
@@ -68,6 +127,76 @@ describe('leaflet-measure-path', function() {
                 expect(circle.getLatLng().lat).to.be(57.69);
                 expect(circle.getLatLng().lng).to.be(11.91);
             })
+        });
+
+        describe('#showOnHover', function() {
+            it('should not add measurements', function() {
+                var circle = L.circle([57.69, 11.89], 200,
+                    {
+                        showMeasurements: true,
+                        measurementOptions: {
+                            minDistance: 0,
+                            showOnHover: true
+                        }
+                    })
+                    .addTo(map);
+
+                expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(0);
+            });
+
+            it('should add measurements on mouseover', function() {
+                var circle = L.circle([57.69, 11.89], 200,
+                    {
+                        showMeasurements: true,
+                        measurementOptions: {
+                            minDistance: 0,
+                            showOnHover: true
+                        }
+                    })
+                    .addTo(map);
+                
+                circle.fire('mouseover');
+                expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(1);
+            });
+
+            it('should remove measurements on mouseout', function() {
+                var circle = L.circle([57.69, 11.89], 200,
+                    {
+                        showMeasurements: true,
+                        measurementOptions: {
+                            minDistance: 0,
+                            showOnHover: true
+                        }
+                    })
+                    .addTo(map);
+                
+                circle.fire('mouseover');
+                circle.fire('mouseout');
+                expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(0);
+            });
+        });
+
+        it('should add measurements', function() {
+            L.circle([57.69, 11.89], 200,
+                {
+                    showMeasurements: true,
+                    measurementOptions: { minDistance: 0 }
+                })
+                .addTo(map);
+
+            expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(1);
+        });
+
+        it('should remove measurements', function() {
+            var circle = L.circle([57.69, 11.89], 200,
+                {
+                    showMeasurements: true,
+                    measurementOptions: { minDistance: 0 }
+                })
+                .addTo(map);
+
+            map.removeLayer(circle);
+            expect(document.querySelectorAll('.leaflet-measure-path-measurement').length).to.be(0);
         });
     })
 });
