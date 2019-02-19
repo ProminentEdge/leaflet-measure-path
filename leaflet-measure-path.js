@@ -157,7 +157,7 @@
      * Implements the showOnHover functionality if called for.
      */
     var addInitHook = function() {
-        const showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
+        var showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
         if (this.options.showMeasurements && !showOnHover) {
             this.showMeasurements();
         }
@@ -227,7 +227,7 @@
         },
 
         onAdd: override(L.Polyline.prototype.onAdd, function() {
-            const showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
+            var showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
             if (this.options.showMeasurements && !showOnHover) {
                 this.showMeasurements(this.options.measurementOptions);
             }
@@ -356,7 +356,7 @@
         },
 
         onAdd: override(L.Circle.prototype.onAdd, function() {
-            const showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
+            var showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
             if (this.options.showMeasurements && !showOnHover) {
                 this.showMeasurements(this.options.measurementOptions);
             }
