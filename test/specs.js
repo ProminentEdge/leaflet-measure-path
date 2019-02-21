@@ -31,7 +31,9 @@ describe('leaflet-measure-path', function() {
                     [57.71, 11.91],
                     [57.69, 11.91]
                 ]);
-                expect(polygon.getLatLngs().length).to.be(5);
+                var latLngs = polygon.getLatLngs();
+                expect(latLngs.length).to.be(1);
+                expect(latLngs[0].length).to.be(5);
             })
         });
 
