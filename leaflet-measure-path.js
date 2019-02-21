@@ -182,7 +182,7 @@
                 var originalReturnValue = method.apply(this, arguments);
                 var args = Array.prototype.slice.call(arguments)
                 args.push(originalReturnValue);
-                return fn.apply(this, arguments);
+                return fn.apply(this, args);
             }
         } else {
             return function() {
