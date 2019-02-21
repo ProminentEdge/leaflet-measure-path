@@ -179,7 +179,9 @@
     var override = function(method, fn, hookAfter) {
         if (!hookAfter) {
             return function() {
-                method.apply(this, arguments);
+                var originalReturnValue = method.apply(this, arguments);
+                var args = Array.prototype.slice.call(arguments)
+                args.push(originalReturnValue);
                 return fn.apply(this, arguments);
             }
         } else {
@@ -226,23 +228,31 @@
             return this;
         },
 
-        onAdd: override(L.Polyline.prototype.onAdd, function() {
+        onAdd: override(L.Polyline.prototype.onAdd, function(originalReturnValue) {
             var showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
             if (this.options.showMeasurements && !showOnHover) {
                 this.showMeasurements(this.options.measurementOptions);
             }
+
+            return originalReturnValue;
         }),
 
-        onRemove: override(L.Polyline.prototype.onRemove, function() {
+        onRemove: override(L.Polyline.prototype.onRemove, function(originalReturnValue) {
             this.hideMeasurements();
+
+            return originalReturnValue;
         }, true),
 
-        setLatLngs: override(L.Polyline.prototype.setLatLngs, function() {
-            return this.updateMeasurements();
+        setLatLngs: override(L.Polyline.prototype.setLatLngs, function(originalReturnValue) {
+            this.updateMeasurements();
+
+            return originalReturnValue;
         }),
 
-        spliceLatLngs: override(L.Polyline.prototype.spliceLatLngs, function() {
-            return this.updateMeasurements();
+        spliceLatLngs: override(L.Polyline.prototype.spliceLatLngs, function(originalReturnValue) {
+            this.updateMeasurements();
+
+            return originalReturnValue;
         }),
 
         formatDistance: formatDistance,
@@ -355,23 +365,31 @@
             return this;
         },
 
-        onAdd: override(L.Circle.prototype.onAdd, function() {
+        onAdd: override(L.Circle.prototype.onAdd, function(originalReturnValue) {
             var showOnHover = this.options.measurementOptions && this.options.measurementOptions.showOnHover;
             if (this.options.showMeasurements && !showOnHover) {
                 this.showMeasurements(this.options.measurementOptions);
             }
+
+            return originalReturnValue;
         }),
 
-        onRemove: override(L.Circle.prototype.onRemove, function() {
+        onRemove: override(L.Circle.prototype.onRemove, function(originalReturnValue) {
             this.hideMeasurements();
+
+            return originalReturnValue;
         }, true),
 
-        setLatLng: override(L.Circle.prototype.setLatLng, function() {
+        setLatLng: override(L.Circle.prototype.setLatLng, function(originalReturnValue) {
             this.updateMeasurements();
+
+            return originalReturnValue;
         }),
 
-        setRadius: override(L.Circle.prototype.setRadius, function() {
+        setRadius: override(L.Circle.prototype.setRadius, function(originalReturnValue) {
             this.updateMeasurements();
+
+            return originalReturnValue;
         }),
 
         formatArea: formatArea,
