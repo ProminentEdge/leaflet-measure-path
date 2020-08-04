@@ -201,6 +201,7 @@
                 minPixelDistance: 30,
                 showDistances: true,
                 showArea: true,
+                showTotalDistance: true,
                 lang: {
                     totalLength: 'Total length',
                     totalArea: 'Total area',
@@ -304,7 +305,7 @@
                 }
 
                 // Show total length for polylines
-                if (!isPolygon) {
+                if (!isPolygon && this._measurementOptions.showTotalDistance) {
                     L.marker.measurement(ll2, formatter(totalDist), options.lang.totalLength, 0, options)
                         .addTo(this._measurementLayer);
                 }
