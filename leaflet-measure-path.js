@@ -97,6 +97,16 @@
                 a = a / 0.09290304;
                 unit = 'ft²';
             }
+        } else if (this._measurementOptions.ha) {
+            if (a > 1000000000) {
+                a = a / 1000000000;
+                unit = 'km²';
+            } else if (a > 10000) {
+                a = a / 10000;
+                unit = 'ha';
+            } else {
+                unit = 'm²';
+            }
         } else {
             if (a > 1000000) {
                 a = a / 1000000;
