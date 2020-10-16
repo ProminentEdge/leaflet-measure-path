@@ -266,6 +266,10 @@
             return originalReturnValue;
         }),
 
+        _updatePath: override(L.Polyline.prototype._updatePath, function() {
+            this.updateMeasurements();
+        }),
+
         formatDistance: formatDistance,
         formatArea: formatArea,
 
