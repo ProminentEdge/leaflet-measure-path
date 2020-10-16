@@ -266,6 +266,10 @@
             return originalReturnValue;
         }),
 
+        _updatePath: override(L.Polyline.prototype._updatePath, function() {
+            this.updateMeasurements();
+        }),
+
         formatDistance: formatDistance,
         formatArea: formatArea,
 
@@ -427,4 +431,11 @@
     L.Circle.addInitHook(function() {
         addInitHook.call(this);
     });
+
+    L.Polygon.include({
+        _updatePath: override(L.Polygon.prototype._updatePath, function() {
+            this.updateMeasurements();
+        }),
+    })
+
 })();
