@@ -431,4 +431,11 @@
     L.Circle.addInitHook(function() {
         addInitHook.call(this);
     });
+
+    L.Polygon.include({
+        _updatePath: override(L.Polygon.prototype._updatePath, function() {
+            this.updateMeasurements();
+        }),
+    })
+
 })();
