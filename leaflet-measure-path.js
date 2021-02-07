@@ -272,10 +272,13 @@
         updateMeasurements: function() {
             if (!this._measurementLayer) return this;
 
+            this._totalArea = 0;
+
             var latLngs = this.getLatLngs(),
                 isPolygon = this instanceof L.Polygon,
                 options = this._measurementOptions,
                 totalDist = 0,
+                multi = false,
                 formatter,
                 ll1,
                 ll2,
@@ -284,49 +287,69 @@
                 pixelDist,
                 dist;
 
-            if (latLngs && latLngs.length && L.Util.isArray(latLngs[0])) {
-                // Outer ring is stored as an array in the first element,
-                // use that instead.
-                latLngs = latLngs[0];
-            }
-
             this._measurementLayer.clearLayers();
 
-            if (this._measurementOptions.showDistances && latLngs.length > 1) {
-                formatter = this._measurementOptions.formatDistance || L.bind(this.formatDistance, this);
+            let _this = this;
 
-                for (var i = 1, len = latLngs.length; (isPolygon && i <= len) || i < len; i++) {
-                    ll1 = latLngs[i - 1];
-                    ll2 = latLngs[i % len];
-                    dist = ll1.distanceTo(ll2);
-                    totalDist += dist;
+            let proccess = function(theLatLngs){
+                if (theLatLngs && theLatLngs.length && L.Util.isArray(theLatLngs[0])) {
+                    // Outer ring is stored as an array in the first element,
+                    // use that instead.
+                    multi = true;
+                    theLatLngs.forEach(function(ll){
+                        proccess(ll);
+                    });
+                } else {
+                    totalDist = 0;
+                    if (_this._measurementOptions.showDistances && theLatLngs.length > 1) {
+                        formatter = _this._measurementOptions.formatDistance || L.bind(_this.formatDistance, _this);
 
-                    p1 = this._map.latLngToLayerPoint(ll1);
-                    p2 = this._map.latLngToLayerPoint(ll2);
+                        for (var i = 1, len = theLatLngs.length; (isPolygon && i <= len) || i < len; i++) {
+                            ll1 = theLatLngs[i - 1];
+                            ll2 = theLatLngs[i % len];
+                            dist = ll1.distanceTo(ll2);
+                            totalDist += dist;
 
-                    pixelDist = p1.distanceTo(p2);
+                            p1 = _this._map.latLngToLayerPoint(ll1);
+                            p2 = _this._map.latLngToLayerPoint(ll2);
 
-                    if (pixelDist >= options.minPixelDistance) {
-                        L.marker.measurement(
-                            this._map.layerPointToLatLng([(p1.x + p2.x) / 2, (p1.y + p2.y) / 2]),
-                            formatter(dist), options.lang.segmentLength, this._getRotation(ll1, ll2), options)
-                            .addTo(this._measurementLayer);
+                            pixelDist = p1.distanceTo(p2);
+
+                            if (pixelDist >= options.minPixelDistance) {
+                                L.marker.measurement(
+                                    _this._map.layerPointToLatLng([(p1.x + p2.x) / 2, (p1.y + p2.y) / 2]),
+                                    formatter(dist), options.lang.segmentLength, _this._getRotation(ll1, ll2), options)
+                                    .addTo(_this._measurementLayer);
+                            }
+                        }
+
+                        // Show total length for polylines
+                        if (!multi && !isPolygon && _this._measurementOptions.showTotalDistance) {
+                            L.marker.measurement(ll2, formatter(totalDist), options.lang.totalLength, 0, options)
+                                .addTo(_this._measurementLayer);
+                        }
                     }
-                }
-
-                // Show total length for polylines
-                if (!isPolygon && this._measurementOptions.showTotalDistance) {
-                    L.marker.measurement(ll2, formatter(totalDist), options.lang.totalLength, 0, options)
-                        .addTo(this._measurementLayer);
                 }
             }
 
-            if (isPolygon && options.showArea && latLngs.length > 2) {
-                formatter = options.formatArea || L.bind(this.formatArea, this);
-                var area = ringArea(latLngs);
-                L.marker.measurement(this.getBounds().getCenter(),
-                    formatter(area), options.lang.totalArea, 0, options)
-                    .addTo(this._measurementLayer);
+            proccess(latLngs);
+
+            latLngs = _this.getLatLngs();
+
+            // Show total area for polygons, use turf if available, if not, multi-polygons are not supported
+            if(isPolygon && options.showArea && (latLngs.length > 2 || multi)) {
+                if(typeof turf === "object" && typeof turf.area === "function"){
+                    formatter = options.formatArea || L.bind(_this.formatArea, _this);
+                    L.marker.measurement(_this.getBounds().getCenter(),
+                        formatter(turf.area(_this.toGeoJSON())), options.lang.totalArea, 0, options)
+                        .addTo(_this._measurementLayer);
+                } else if(!multi){
+                    formatter = options.formatArea || L.bind(_this.formatArea, _this);
+                    var area = ringArea(latLngs);
+                    L.marker.measurement(_this.getBounds().getCenter(),
+                        formatter(area), options.lang.totalArea, 0, options)
+                        .addTo(_this._measurementLayer);
+                }
             }
 
             return this;
