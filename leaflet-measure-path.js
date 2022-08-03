@@ -228,11 +228,9 @@
         },
 
         hideMeasurements: function() {
-            if (!this._map) return this;
+            if (!this._map || !this._measurementLayer) return this;
 
             this._map.off('zoomend', this.updateMeasurements, this);
-
-            if (!this._measurementLayer) return this;
             this._map.removeLayer(this._measurementLayer);
             this._measurementLayer = null;
 
@@ -365,11 +363,9 @@
         },
 
         hideMeasurements: function() {
-            if (!this._map) return this;
+            if (!this._map || !this._measurementLayer) return this;
 
             this._map.on('zoomend', this.updateMeasurements, this);
-
-            if (!this._measurementLayer) return this;
             this._map.removeLayer(this._measurementLayer);
             this._measurementLayer = null;
 
