@@ -268,7 +268,21 @@
 
         formatDistance: formatDistance,
         formatArea: formatArea,
+        getCentroid(points) {
+            let sumLat = 0;
+            let sumLng = 0;
+            const numPoints = points.length;
 
+            for (let i = 0; i < numPoints; i++) {
+                sumLat += points[i].lat;
+                sumLng += points[i].lng;
+            }
+
+            const centroidLat = sumLat / numPoints;
+            const centroidLng = sumLng / numPoints;
+
+            return [centroidLat, centroidLng];
+        },
         updateMeasurements: function() {
             if (!this._measurementLayer) return this;
 
@@ -324,7 +338,7 @@
             if (isPolygon && options.showArea && latLngs.length > 2) {
                 formatter = options.formatArea || L.bind(this.formatArea, this);
                 var area = ringArea(latLngs);
-                L.marker.measurement(this.getBounds().getCenter(),
+                L.marker.measurement(this.getCentroid(latLngs),
                     formatter(area), options.lang.totalArea, 0, options)
                     .addTo(this._measurementLayer);
             }
